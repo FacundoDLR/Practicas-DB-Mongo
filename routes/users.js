@@ -11,4 +11,8 @@ router.get('/:id', usersController.getUserById);
 
 router.post('/registro', usersController.postUser)
 
+router.put('/actualizar/:id', usersController.putUser)
+
+router.delete('/eliminar/:id', usersController.deleteUser)
+
 module.exports = router;
