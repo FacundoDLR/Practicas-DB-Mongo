@@ -1,9 +1,12 @@
 
+const { validationResult } = require('express-validator');
 const User = require('../models/User')
 
 const getUsers = async (req, res) => {
     const usuarios = await User.find();
-    res.status(200).json(usuarios);
+    res
+    .status(200)
+    .json(usuarios);
 };
 
 const getUserById = async (req, res) => {
@@ -42,20 +45,42 @@ const getUserByName = async (req, res) => {
 
 //Crear nuevo documento/registro/usuario
 const postUser = async (req, res) => {
+
     try {
-        const user = new User(req.body);
 
-        await user.save();
-        res.status(201).json({username: user.username, msg: "Ok"})
+        const validationError = validationResult(req);
 
+        if(validationError.isEmpty()){
+
+            const user = new User(req.body);
+
+            await user.save();
+            res
+            .status(201)
+            .json({
+                username: user.username, 
+                msg: "Ok", 
+                error: null
+            }) 
+
+        }else{
+            res
+            .status(400)
+            .json({
+                username: null, 
+                msg: "Los datos son incorrectos",
+                error: validationError.errors
+            })
+        }
     } catch (error) {
         res
         .status(500)
-        .json({msg: "Error - " + error.message})
-        
+        .json({username: req.body.username, 
+            msg: "Error", 
+            error: error.message
+        })
     }
-
-}
+};
 
 //Actualizacion de documento/registro/usuario
 const putUser = async (req, res) => {
@@ -64,13 +89,17 @@ const putUser = async (req, res) => {
 
         await User.findByIdAndUpdate(req.params.id, req.body);
 
-        res.status(200).json({
+        res
+        .status(200)
+        .json({
             username: req.body.username, 
             msg: "El usuario ha sido actualizado correctamente"
         })
 
     } catch (error) {
-        res.status(500).json({
+        res
+        .status(500)
+        .json({
             msg: "Error - " + error.message
         })
     }
@@ -99,7 +128,11 @@ const deleteUser = async (req, res) => {
         }
 
     } catch (error) {
-        res.status(500).json({msg: "Error - " + error.message})
+        res
+        .status(500)
+        .json({
+            msg: "Error - " + error.message
+        })
     }
 }
 
