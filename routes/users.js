@@ -1,7 +1,8 @@
 const express = require('express');
 const { check } = require('express-validator');
 const router = express.Router();
-const usersController = require('../controllers/usersController')
+const usersController = require('../controllers/usersController');
+const validarUsername = require('../middlewares/validarUsername');
 
 /* GET users listing. */
 router.get('/', usersController.getUsers);
@@ -32,7 +33,7 @@ router.post('/registro',
             .withMessage("El email es obligatorio")
             .isEmail()
             .withMessage("El email debe ser valido"),
-    ],
+    ], validarUsername,
     usersController.postUser
 );
 
