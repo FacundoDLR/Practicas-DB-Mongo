@@ -1,6 +1,7 @@
 
 const { validationResult } = require('express-validator');
 const User = require('../models/User')
+const bcrypt = require('bcrypt')
 
 const getUsers = async (req, res) => {
     const usuarios = await User.find();
@@ -52,7 +53,16 @@ const postUser = async (req, res) => {
 
         if(validationError.isEmpty()){
 
-            const user = new User(req.body);
+            const salt = bcrypt.genSaltSync(10);
+            const hash = bcrypt.hashSync(req.body.password, salt);
+
+            const hashedUser = {
+                username: req.body.username,
+                password: hash,
+                email: req.body.email,
+            }
+
+            const user = new User(hashedUser);
 
             await user.save();
             res
